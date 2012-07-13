@@ -1,0 +1,98 @@
+rotjoin
+=======
+
+Version 0.3, 13 July 2012
+Written by Paul Kelly
+Copyright (C) 2012 NP Broadcast Ltd.
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+
+Usage
+-----
+
+rotjoin [-p <prefix>] -b <timestamp> -e <timestamp> [-o <filename>] [-f flac|wav] [-h]
+
+Creates output audio file containing all audio between specified timestamps.
+Source audio should be contained in minute-long files as <prefix>YYYY-MM-DD/HHMM.[flac|wav].
+Output file will have same sample rate and no. of channels as first input file opened.
+
+   -p <prefix>    Prefix where the minute-long ROT files are located (may contain / characters)
+   -b <timestamp> Begin timestamp in YYYYMMDDHHMMSS[.xx] format
+   -e <timestamp> End timestamp in YYYYMMDDHHMMSS[.xx] format
+   -o <filename>  Output filename (stdout if not specified)
+   -f flac|wav    Output format (FLAC or WAV). If not specified, format determined from output
+                  filename if possible, otherwise from first input file opened.
+   -h             Display this usage message and exit
+
+
+Installation
+------------
+
+There is one required dependency:
+
+* libsndfile
+  http://www.mega-nerd.com/libsndfile/
+  
+This must be present and installed before this program can be built.
+
+The program can be compiled by issuing a simple "make" command. If
+necessary, any include or library path required for libsndfile can be
+added to the INCLUDES and/or LIBS entries in the Makefile.
+
+To install the program issue the command
+sudo make install PREFIX=/usr
+This will install to /usr/bin (the default value of PREFIX is /usr/local).
+
+
+Overview
+--------
+
+This utility can be used to join a series of WAV or FLAC audio files
+(or parts of files) into one larger file for seamless playback. The
+input files to be joined should be stored in minute-long files in a
+hierarchical directory structure with the naming convention
+
+    <prefix>YYYY-MM-DD/HHMM.[flac|wav]
+
+Where <prefix> can be specified on the command-line. Typically <prefix>
+will end with a trailing / character, although this is not required.
+Separate beginning and ending timestamps must be specified with the -b
+and -e flags respectively, and all audio between the two times will
+be output to the file specified with the -o option, or to standard
+output if the -o option is not given.
+
+If possible, the output file format will be determined automatically
+from the filename extension (if this consists of either ".flac" or
+".wav"). Otherwise (always in the case of output to standard output),
+it will be set to the same file format as the first input file opened.
+Both these behaviours can be overridden by specifying the -f flag with
+an argument of either wav or flac. The output file format will then be
+forced to this format, irrespective of the filename extension or the
+format of the input files.
+
+The output audio will have the same number of channels and sample rate
+as the first input file opened. If subsequent input files do not have
+the same number of channels and samplerate as the first, the output
+may be distorted.
+
+On succesful appending of each input file, the program will print a
+line to standard error of the form:
+File "input-filename.wav": x.xxxxs output
+where x.xxxx is the duration of audio output in seconds, to four decimal
+places.
+
+When all input files have been processed and the output file closed, the
+program will print a line to standard error of the form:
+Total output duration: x.xxxxs
+indicating the total duration of output audio, again in seconds to four
+decimal places.
+These lines are suitable for parsing by a script.
+
+
+--
+Berlin, July 2012.
